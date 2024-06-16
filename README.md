@@ -58,3 +58,4 @@ streamlit run video2sent_main.py
 
 This command starts the Streamlit server and opens your default web browser to the app. 
 The app will update in real-time as you modify your script.
+thank you
