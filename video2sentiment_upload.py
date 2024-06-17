@@ -224,9 +224,7 @@ def upload_to_video_indexer(video_name, language_code, speech_speaker, descripti
 
 def upload_to_video_indexer_fromlocalfile(uploaded_file, language_code, speech_speaker, speech_description):
     
-    if video_name is None or not isinstance(video_name, str):
-        print("Invalid video name provided.")
-        return
+
     # Fetch environment variables
     print("start the upload VI process")
     subscription_key = os.getenv('SUBSCRIPTION_KEY')
@@ -235,9 +233,9 @@ def upload_to_video_indexer_fromlocalfile(uploaded_file, language_code, speech_s
     api_url = os.getenv('API_URL')
     headers = {"Ocp-Apim-Subscription-Key": subscription_key}
     download_path = os.getenv('DOWNLOAD_PATH')
-
+    video_name = uploaded_file.name
     # Get access token
-    print ("the video name is: "+ video_name)
+
     access_token = get_access_token()
     print("the access token is: "+ access_token)
 
@@ -247,7 +245,7 @@ def upload_to_video_indexer_fromlocalfile(uploaded_file, language_code, speech_s
     # Construct the upload URL
     indexingPreset = 'AdvancedVideo'
     excludedAI='Celebrities,DetectedObjects,Emotions,Entities,Faces,Keywords,KnownPeople,OCR,RollingCredits,ShotType,Speakers,Topics'
-    upload_url = f"{api_url}/{location}/Accounts/{account_id}/Videos?accessToken={access_token}&name={video_name}&description={description}&language={language_code}&metadata={speech_speaker}&excludedAI={excludedAI}"
+    upload_url = f"{api_url}/{location}/Accounts/{account_id}/Videos?accessToken={access_token}&name={video_name}&description={speech_description}&language={language_code}&metadata={speech_speaker}&excludedAI={excludedAI}"
 
     # Define the path to the video file
     video_path = os.path.join('/Users/robenhai/video2sentiment/videos', uploaded_file.name)
