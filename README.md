@@ -16,11 +16,59 @@
 - Python 3.7+
 - An Azure account with Video Indexer and a SQL database set up.
 - An OpenAI API key.
+- An MS-SQL DB
 
 ### Installation
 
 1. Clone the repository.
 2. Install the required Python packages using pip:
+3. Create DB with the following tables:
+
+CREATE TABLE speech_general_hebrew_language (
+    speech_vi_video_id nvarchar COLLATE Arabic_CI_AI_KS,
+    speech_date date,
+    speech_speaker nvarchar COLLATE Arabic_CI_AI_KS,
+    speech_description nvarchar COLLATE Arabic_CI_AI_KS,
+    speech_caption_hebrew_language nvarchar COLLATE Arabic_CI_AI_KS,
+    speech_caption_summary_hebrew_language nvarchar COLLATE Arabic_CI_AI_KS
+);
+
+CREATE TABLE speech_general_info (
+    speech_vi_video_id varchar COLLATE Arabic_CI_AI_KS,
+    speech_date date,
+    speech_speaker varchar COLLATE Arabic_CI_AI_KS,
+    speech_description text COLLATE Arabic_CI_AI_KS
+);
+
+CREATE TABLE speech_general_original_language (
+    speech_date date,
+    speech_speaker nvarchar COLLATE Arabic_CI_AI_KS,
+    speech_description nvarchar COLLATE Arabic_CI_AI_KS,
+    speech_caption_original_language nvarchar COLLATE Arabic_CI_AI_KS,
+    speech_caption_summary_original_language nvarchar COLLATE Arabic_CI_AI_KS,
+    speech_vi_video_id nvarchar COLLATE Arabic_CI_AI_KS
+);
+
+CREATE TABLE speech_sentiment_hebrew_language (
+    speech_vi_video_id nvarchar COLLATE Arabic_CI_AI_KS,
+    speech_sentence_number int,
+    speech_text_original_language nvarchar COLLATE Arabic_CI_AI_KS,
+    speech_entity nvarchar COLLATE Arabic_CI_AI_KS,
+    speech_sentiment nvarchar COLLATE Arabic_CI_AI_KS,
+    speech_emotion nvarchar COLLATE Arabic_CI_AI_KS,
+    speech_empathy_level nvarchar COLLATE Arabic_CI_AI_KS
+);
+
+CREATE TABLE speech_sentiment_original_language (
+    speech_vi_video_id nvarchar COLLATE Arabic_CI_AI_KS,
+    speech_sentence_number int,
+    speech_text_original_language nvarchar COLLATE Arabic_CI_AI_KS,
+    speech_entity nvarchar COLLATE Arabic_CI_AI_KS,
+    speech_sentiment nvarchar COLLATE Arabic_CI_AI_KS,
+    speech_emotion nvarchar COLLATE Arabic_CI_AI_KS,
+    speech_empathy_level nvarchar COLLATE Arabic_CI_AI_KS
+);
+
 
 ```bash
 pip install -r requirements.txt
