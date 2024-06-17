@@ -200,7 +200,7 @@ def main():
             
 
             #delete the video_id
-            #delete_video(speech_vi_video_id)
+            delete_video(speech_vi_video_id)
             # delete all data from the database based on the video_id from all tables
             odbc_conn_str = os.getenv('ODBC_CONN_STR')
             conn = pyodbc.connect(odbc_conn_str)
