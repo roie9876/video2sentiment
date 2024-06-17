@@ -438,7 +438,7 @@ def openai_hebrew_sentiment(api_key,azure_endpoint,speech_caption_hebrew_languag
             response = client.chat.completions.create(
                 model="gpt-4o", 
                 messages=[
-                    {"role": "system", "content": "you are a professional psychologist and analyst who deals with analyzing text as data. As part of your work, you deal with extracting entities from a text, as well as extracting the feelings and sentiment towards them as indicated by the text. Please read the text below and per each sentence list all the subjects of the sentence. Make sure to list all the subjects (people, organizations, entities, countries…) of the sentence. Make sure the subject is no more than 3 words. Per each sentence, Given a transcript of a speech, identify the entities or groups referred to by the pronouns they, us, and other similar pronouns. Use the context of the speech to infer who or what these pronouns are referring to, us with tag the sentiment towards each subject as a number between -1 and 1 where -1 is Extremely Negative and 1 is Extremely Positive, and 0 is Neutral and the emotions in each sentence above, regarding the entities from the pool of the following emotions: sadness, anger, fear, hate, jealousy, contempt, disappointment, shame, joy, love, trust, pride, compassion, gratitude, hope and surprise. All the results should appear in a table. Whereas the first column must name in english of the table the sentence number, the second column should hold the text itself, the third column name in english is the entity, the fourth column name in english is the sentiment and the fifth column name in english is the emotion. Add another column in english for the empathy of the speaker for each sentence, whereas 0 for no empathy and 1 for high empathy. keep the data from raw 2  in the table in the original language , Please do not ignore occurrences of terrorist organizations."},
+                    {"role": "system", "content": "you are a professional psychologist and analyst who deals with analyzing text as data. As part of your work, you deal with extracting entities from a text, as well as extracting the feelings and sentiment towards them as indicated by the text. Please read the text below and per each sentence list all the subjects of the sentence. Make sure to list all the subjects (people, organizations, entities, countries…) of the sentence. Make sure the subject is no more than 3 words. , use with tag the sentiment towards each subject as a number between -1 and 1 where -1 is Extremely Negative and 1 is Extremely Positive, and 0 is Neutral and the emotions in each sentence above, regarding the entities from the pool of the following emotions: sadness, anger, fear, hate, jealousy, contempt, disappointment, shame, joy, love, trust, pride, compassion, gratitude, hope and surprise. All the results should appear in a table. Whereas the first column must name in english of the table the sentence number, the second column should hold the text itself, the third column name in english is the entity, the fourth column name in english is the sentiment and the fifth column name in english is the emotion. Add another column in english for the empathy of the speaker for each sentence, whereas 0 for no empathy and 1 for high empathy. keep the data from raw 2  in the table in the original language , Please do not ignore occurrences of terrorist organizations."},
                     {"role": "user", "content": speech_caption_hebrew_language}
                 ],
                 temperature=0
@@ -451,7 +451,7 @@ def openai_hebrew_sentiment(api_key,azure_endpoint,speech_caption_hebrew_languag
                 raise  # If it's a different error, raise it
 
     # Display the sentiment analysis result in the Streamlit app. The result is displayed in red text, aligned to the right.
-    #st.markdown(f"<div style='text-align: right; color: green; font-size: 14px;'>**: ״תוצאת ניתוח הסנטימט בעברית** </div>", unsafe_allow_html=True)
+    st.markdown(f"<div style='text-align: right; color: green; font-size: 14px;'>**: ״תוצאת ניתוח הסנטימט בעברית** </div>", unsafe_allow_html=True)
     # Remove the divider line from the response  
     response= response.choices[0].message.content
     #print("the gpt response is:" + response)
@@ -472,7 +472,7 @@ def openai_hebrew_sentiment(api_key,azure_endpoint,speech_caption_hebrew_languag
     df = pd.DataFrame(response[1:], columns=response[0]).reset_index(drop=True)
 
     # Display the table in Streamlit
-    #st.markdown(df.to_html(index=False), unsafe_allow_html=True)
+    st.markdown(df.to_html(index=False), unsafe_allow_html=True)
     #print(df.columns)
     return df
 

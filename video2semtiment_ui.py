@@ -1,5 +1,6 @@
 # Importing necessary libraries
 import streamlit as st
+#st.set_page_config(layout="wide")  
 import streamlit.components.v1 as components
 import requests
 import json
@@ -21,7 +22,7 @@ from VideoIndexerClient.Consts import Consts
 from VideoIndexerClient.VideoIndexerClient import VideoIndexerClient
 
 # Setting the page layout to wide
-st.set_page_config(layout="wide")  
+
 
 # Loading environment variables
 config = dotenv_values(".env")

@@ -17,6 +17,7 @@
 - An Azure account with Video Indexer and a SQL database set up.
 - An OpenAI API key.
 - An MS-SQL DB
+- Create Service Prinsiple User (UPN) and inside VI portal in the AIM assigen to this usr Contributer role
 
 ### Installation
 
@@ -25,49 +26,50 @@
 3. Create DB with the following tables:
 
 CREATE TABLE speech_general_hebrew_language (
-    speech_vi_video_id nvarchar COLLATE Arabic_CI_AI_KS,
-    speech_date date,
-    speech_speaker nvarchar COLLATE Arabic_CI_AI_KS,
-    speech_description nvarchar COLLATE Arabic_CI_AI_KS,
-    speech_caption_hebrew_language nvarchar COLLATE Arabic_CI_AI_KS,
-    speech_caption_summary_hebrew_language nvarchar COLLATE Arabic_CI_AI_KS
+    speech_vi_video_id NVARCHAR(255) COLLATE Arabic_CI_AI_KS,
+    speech_date DATE,
+    speech_speaker NVARCHAR(255) COLLATE Arabic_CI_AI_KS,
+    speech_description NVARCHAR(255) COLLATE Arabic_CI_AI_KS,
+    speech_caption_hebrew_language NVARCHAR(MAX) COLLATE Arabic_CI_AI_KS,
+    speech_caption_summary_hebrew_language NVARCHAR(MAX) COLLATE Arabic_CI_AI_KS
 );
 
 CREATE TABLE speech_general_info (
-    speech_vi_video_id varchar COLLATE Arabic_CI_AI_KS,
-    speech_date date,
-    speech_speaker varchar COLLATE Arabic_CI_AI_KS,
-    speech_description text COLLATE Arabic_CI_AI_KS
+    speech_vi_video_id VARCHAR(255) COLLATE Arabic_CI_AI_KS,
+    speech_date DATE,
+    speech_speaker VARCHAR(255) COLLATE Arabic_CI_AI_KS,
+    speech_description TEXT COLLATE Arabic_CI_AI_KS
 );
 
 CREATE TABLE speech_general_original_language (
-    speech_date date,
-    speech_speaker nvarchar COLLATE Arabic_CI_AI_KS,
-    speech_description nvarchar COLLATE Arabic_CI_AI_KS,
-    speech_caption_original_language nvarchar COLLATE Arabic_CI_AI_KS,
-    speech_caption_summary_original_language nvarchar COLLATE Arabic_CI_AI_KS,
-    speech_vi_video_id nvarchar COLLATE Arabic_CI_AI_KS
+    speech_date DATE,
+    speech_speaker NVARCHAR(255) COLLATE Arabic_CI_AI_KS,
+    speech_description NVARCHAR(MAX) COLLATE Arabic_CI_AI_KS,
+    speech_caption_original_language NVARCHAR(MAX) COLLATE Arabic_CI_AI_KS,
+    speech_caption_summary_original_language NVARCHAR(MAX) COLLATE Arabic_CI_AI_KS,
+    speech_vi_video_id NVARCHAR(MAX) COLLATE Arabic_CI_AI_KS
 );
 
 CREATE TABLE speech_sentiment_hebrew_language (
-    speech_vi_video_id nvarchar COLLATE Arabic_CI_AI_KS,
-    speech_sentence_number int,
-    speech_text_original_language nvarchar COLLATE Arabic_CI_AI_KS,
-    speech_entity nvarchar COLLATE Arabic_CI_AI_KS,
-    speech_sentiment nvarchar COLLATE Arabic_CI_AI_KS,
-    speech_emotion nvarchar COLLATE Arabic_CI_AI_KS,
-    speech_empathy_level nvarchar COLLATE Arabic_CI_AI_KS
+    speech_vi_video_id NVARCHAR(MAX) COLLATE Arabic_CI_AS,
+    speech_sentence_number INT,
+    speech_text_original_language NVARCHAR(MAX) COLLATE Hebrew_CI_AI_KS,
+    speech_entity NVARCHAR(MAX) COLLATE Hebrew_CI_AI_KS,
+    speech_sentiment NVARCHAR(MAX) COLLATE Arabic_CI_AS,
+    speech_emotion NVARCHAR(MAX) COLLATE Arabic_CI_AS,
+    speech_empathy_level NVARCHAR(MAX) COLLATE Arabic_CI_AS
 );
 
 CREATE TABLE speech_sentiment_original_language (
-    speech_vi_video_id nvarchar COLLATE Arabic_CI_AI_KS,
-    speech_sentence_number int,
-    speech_text_original_language nvarchar COLLATE Arabic_CI_AI_KS,
-    speech_entity nvarchar COLLATE Arabic_CI_AI_KS,
-    speech_sentiment nvarchar COLLATE Arabic_CI_AI_KS,
-    speech_emotion nvarchar COLLATE Arabic_CI_AI_KS,
-    speech_empathy_level nvarchar COLLATE Arabic_CI_AI_KS
+    speech_vi_video_id NVARCHAR(MAX) COLLATE Arabic_CI_AI_KS,
+    speech_sentence_number INT,
+    speech_text_original_language NVARCHAR(MAX) COLLATE Arabic_CI_AI_KS,
+    speech_entity NVARCHAR(MAX) COLLATE Arabic_CI_AI_KS,
+    speech_sentiment NVARCHAR(MAX) COLLATE Arabic_CI_AI_KS,
+    speech_emotion NVARCHAR(MAX) COLLATE Arabic_CI_AI_KS,
+    speech_empathy_level NVARCHAR(MAX) COLLATE Arabic_CI_AI_KS
 );
+
 
 
 ```bash
