@@ -69,9 +69,9 @@ df = pd.DataFrame({
     'speech_emotion': ['happy', 'sad', 'neutral', 'happy', 'sad']
 })
 
-def delete_video(video_id, access_token):
+def delete_video(video_id):
         # Fetch environment variables
-    print("start the upload VI process")
+    print("start the delete video id")
     subscription_key = os.getenv('SUBSCRIPTION_KEY')
     location = os.getenv('LOCATION')
     account_id = os.getenv('ACCOUNT_ID')
@@ -83,6 +83,18 @@ def delete_video(video_id, access_token):
     #description = quote(video_name)
     access_token = get_access_token()
     #print("the access token is: "+ access_token)
+    upload_url = f"https://api.videoindexer.ai/{location}/Accounts/{account_id}/Videos/{video_id}?accessToken={access_token}"
+    #st.write("The upload url is: "+ upload_url) 
+    response = requests.delete(upload_url)
+    #st.write(response)
+
+    # Check if there was an error uploading the video
+    if "ErrorType" in response:
+        
+        print(f"Error delete video: {response['Message']}")
+    else:
+        print(f"Video deleted successfully video: "+ video_id)
+        st.write(f"Video deleted successfully video: "+ video_id)
 
 
 # Function to get all video ids
@@ -117,22 +129,30 @@ def get_all_thumbnail_ids(video_ids):
     thumbnail_ids = []
     max_cols_per_row = 4
     rows = [st.columns(max_cols_per_row) for _ in range((len(video_ids) + max_cols_per_row - 1) // max_cols_per_row)]
+    video_ids_list = []
+
     with concurrent.futures.ThreadPoolExecutor() as executor:
         futures = [executor.submit(fetch_thumbnail, video_id) for video_id in video_ids]
-        for i, future in enumerate(concurrent.futures.as_completed(futures)):
+        for i, future in enumerate(futures):
             try:
                 success, image, description, video_id, duration = future.result()
                 if success:
                     row = rows[i // max_cols_per_row]
                     col = row[i % max_cols_per_row]
                     col.image(image)
-                    col.write(f"Descriptin: {description}")
+                    col.write(f"Description: {description}")
                     col.write(f"Duration: {duration}")
-                    if col.button(f'Click for image {i}'):
+                    col.write(f"Video ID: {video_id}")
+                    if col.button(f'Click for video {video_id}'):
                         return True, video_id
+                    video_ids_list.append(video_id)
             except Exception as e:
                 print(f"Exception occurred: {e}")
+
     return False, None
+
+
+
 
 
 
@@ -158,30 +178,42 @@ def main():
     azure_endpoint = os.getenv('AZURE_OPENAI_ENDPOINT')
     odbc_conn_str = os.getenv('ODBC_CONN_STR')
 
-
-
     # Establish a connection to the database
     conn = pyodbc.connect(odbc_conn_str)  
     video_ids = get_all_video_ids()  
     names = ["Hasan Nasrallah", "Joy Biden", "Mohammed Bin Salman"]  
     selected_name = st.sidebar.selectbox('Select a name', names)  
-    filtered_videos = [video for video in video_ids['results'] if video.get('metadata') == selected_name]  
-    image_button_clicked, video_id = get_all_thumbnail_ids(filtered_videos)  
-      
-    if image_button_clicked:  
-        speech_vi_video_id=video_id
-            # Fetch speech data
-        speech_data = fetch_speech_general_info(speech_vi_video_id)
-        # Convert speech_data to a DataFrame
-        df = pd.DataFrame(speech_data, columns=['Column1', 'Column2', 'Column3'])
+    filtered_videos = [video for video in video_ids['results'] if video.get('metadata') == selected_name] 
 
-        # Display the DataFrame as a table in Streamlit
-        st.table(df)
-        
-        if speech_data is not None:
-            speech_date = speech_data['date']
-            speech_speaker = speech_data['speaker']
-            speech_description = speech_data['description']
+    image_button_clicked, video_id = get_all_thumbnail_ids(filtered_videos)
+
+    if image_button_clicked:
+        if video_id is not None and video_id != '':
+            speech_vi_video_id=video_id
+            
+
+            
+            
+                # Fetch speech data
+            
+            # Convert speech_data to a DataFrame
+            
+
+            #delete the video_id
+            #delete_video(speech_vi_video_id)
+            # delete all data from the database based on the video_id from all tables
+            odbc_conn_str = os.getenv('ODBC_CONN_STR')
+            conn = pyodbc.connect(odbc_conn_str)
+            cursor = conn.cursor()
+            try:
+                cursor.execute("DELETE FROM speech_general_info WHERE speech_vi_video_id = ?", (speech_vi_video_id,))
+                cursor.execute("DELETE FROM speech_general_hebrew_language WHERE speech_vi_video_id = ?", (speech_vi_video_id,))
+                cursor.execute("DELETE FROM speech_general_original_language WHERE speech_vi_video_id = ?", (speech_vi_video_id,))
+                cursor.execute("DELETE FROM speech_sentiment_hebrew_language WHERE speech_vi_video_id = ?", (speech_vi_video_id,))
+                cursor.execute("DELETE FROM speech_sentiment_original_language WHERE speech_vi_video_id = ?", (speech_vi_video_id,))
+                conn.commit()
+            except Exception as e:
+                print(f"Database error: {e}")
             
 
 

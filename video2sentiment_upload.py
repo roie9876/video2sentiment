@@ -16,6 +16,7 @@ import pyodbc
 import pandas as pd
 import urllib
 import subprocess
+from django.core.files.uploadedfile import UploadedFile
 
 from sqlalchemy import create_engine
 
@@ -145,8 +146,9 @@ if upload_button:
 #         return video_id
 
 def upload_to_video_indexer(video_name, language_code, speech_speaker, description, source='youtube'):
-    if video_name is None:
-        print("No video name provided.")
+    
+    if video_name is None or not isinstance(video_name, str):
+        print("Invalid video name provided.")
         return
     # Fetch environment variables
     print("start the upload VI process")
@@ -176,6 +178,79 @@ def upload_to_video_indexer(video_name, language_code, speech_speaker, descripti
     else:
         video_path = f"/Users/robenhai/video2sentiment/videos/{video_name}"
 
+    # Open the video file and send a POST request to the upload URL
+    with open(video_path, "rb") as video_file:
+        response = requests.post(upload_url, files={"file": video_file})
+        response_json = response.json()
+        print("The response of upload to VI is:" + json.dumps(response_json))
+
+        # Check if there was an error uploading the video
+        if "ErrorType" in response_json:
+            print(f"Error uploading video: {response_json['Message']}")
+        else:
+            video_id = response_json["id"]
+
+    # Initialize retry parameters
+    max_retries = 10000
+    retries = 0
+
+    # Check the video index status until it's processed or max retries reached
+    while retries < max_retries:
+        # Get the video index status
+        index_status_url = f"{api_url}/{location}/Accounts/{account_id}/Videos/{video_id}/Index?accessToken={access_token}"
+        index_status_response = requests.get(index_status_url)
+        index_status = index_status_response.json()
+
+        # If the video has finished indexing, break the loop
+        for video in index_status["videos"]:
+            if video["state"] == "Processed":
+                break
+        else:
+            # Wait for a while before checking again
+            time.sleep(10)  # Wait for 10 seconds
+            st.write("the video is processing")
+            print("the video is processing")
+            retries += 1
+            continue
+        break
+
+    # If max retries reached, print a message
+    if retries == max_retries:
+        st.write("Video processing took too long. Please check the video status manually.")
+        print("Video processing took too long. Please check the video status manually.")
+    else:
+        return video_id
+    
+
+def upload_to_video_indexer_fromlocalfile(uploaded_file, language_code, speech_speaker, speech_description):
+    
+    if video_name is None or not isinstance(video_name, str):
+        print("Invalid video name provided.")
+        return
+    # Fetch environment variables
+    print("start the upload VI process")
+    subscription_key = os.getenv('SUBSCRIPTION_KEY')
+    location = os.getenv('LOCATION')
+    account_id = os.getenv('ACCOUNT_ID')
+    api_url = os.getenv('API_URL')
+    headers = {"Ocp-Apim-Subscription-Key": subscription_key}
+    download_path = os.getenv('DOWNLOAD_PATH')
+
+    # Get access token
+    print ("the video name is: "+ video_name)
+    access_token = get_access_token()
+    print("the access token is: "+ access_token)
+
+    # Free text to be displayed in the Streamlit UI
+    original_text = '<p style="color:red;font-weight:bold;">This is original text from video.</p>'  
+
+    # Construct the upload URL
+    indexingPreset = 'AdvancedVideo'
+    excludedAI='Celebrities,DetectedObjects,Emotions,Entities,Faces,Keywords,KnownPeople,OCR,RollingCredits,ShotType,Speakers,Topics'
+    upload_url = f"{api_url}/{location}/Accounts/{account_id}/Videos?accessToken={access_token}&name={video_name}&description={description}&language={language_code}&metadata={speech_speaker}&excludedAI={excludedAI}"
+
+    # Define the path to the video file
+    video_path = os.path.join('/Users/robenhai/video2sentiment/videos', uploaded_file.name)
     # Open the video file and send a POST request to the upload URL
     with open(video_path, "rb") as video_file:
         response = requests.post(upload_url, files={"file": video_file})
@@ -327,9 +402,12 @@ def main():
     speech_vi_video_id = None  # Initialize the variable
 
     if selected_language: 
-        if st.button('Upload Video', key='UploadButton1'):
+        language_code = languages[selected_language]  # Assign a value to language_code here
+        uploaded_file = st.file_uploader("Choose a video file", type=['mp4', 'mov', 'avi'], key='UploadButton1')
+
+        if uploaded_file is not None:
             # Call the upload_to_video_indexer function with the selected source
-            video_id = upload_to_video_indexer(video_name, language_code, speech_speaker, description, source)
+            video_id = upload_to_video_indexer_fromlocalfile(uploaded_file, language_code, speech_speaker, speech_description)
             st.write(f'Video ID: {video_id}')
         
         if source == 'YouTube':
@@ -340,17 +418,12 @@ def main():
                 video_name = download_youtube_video(youtube_url)
                 print("the youtube url is before download : "+ youtube_url )
                 print("the selected language code: "+ languages[selected_language])
-                language_code=languages[selected_language]
                 speech_vi_video_id = upload_to_video_indexer(video_name,language_code,speech_speaker,speech_description)
                 if speech_vi_video_id is not None:
                     st.write("Finish to upload the video, the video id is: "+ speech_vi_video_id)
                     insert_speech_general_info(speech_vi_video_id, speech_date, speech_speaker,speech_description)
                 else:
                     st.write("Failed to upload the video.")
-                    # speech_caption_original_language = download_video_captions_original_language(video_name,speech_vi_video_id,language_code)
-
-            #update generl info table:
-            #insert_speech_general_info(speech_vi_video_id, speech_date, speech_speaker,speech_description)
                 
 
 

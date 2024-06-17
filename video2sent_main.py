@@ -6,6 +6,7 @@ import SessionState
 import video2sentiment_upload
 import video2semtiment_ui
 import video2semtiment_openai
+import video2sentiment_delete
 
 # Create a function for each page
 def page_video2sentiment_upload():

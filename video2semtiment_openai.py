@@ -451,7 +451,7 @@ def openai_hebrew_sentiment(api_key,azure_endpoint,speech_caption_hebrew_languag
                 raise  # If it's a different error, raise it
 
     # Display the sentiment analysis result in the Streamlit app. The result is displayed in red text, aligned to the right.
-    st.markdown(f"<div style='text-align: right; color: green; font-size: 14px;'>**: ״תוצאת ניתוח הסנטימט בעברית** </div>", unsafe_allow_html=True)
+    #st.markdown(f"<div style='text-align: right; color: green; font-size: 14px;'>**: ״תוצאת ניתוח הסנטימט בעברית** </div>", unsafe_allow_html=True)
     # Remove the divider line from the response  
     response= response.choices[0].message.content
     #print("the gpt response is:" + response)
@@ -472,7 +472,7 @@ def openai_hebrew_sentiment(api_key,azure_endpoint,speech_caption_hebrew_languag
     df = pd.DataFrame(response[1:], columns=response[0]).reset_index(drop=True)
 
     # Display the table in Streamlit
-    st.markdown(df.to_html(index=False), unsafe_allow_html=True)
+    #st.markdown(df.to_html(index=False), unsafe_allow_html=True)
     #print(df.columns)
     return df
 
@@ -635,7 +635,7 @@ def main():
             #st_ace(value=video_id, key="video_id")
             #st.write("working on video_id:" + video_id)
             speech_vi_video_id=video_id
-            #st.write("working on video_id:" + speech_vi_video_id)
+            st.write("working on video_id:" + speech_vi_video_id)
                 # Fetch speech data
             speech_data = fetch_speech_general_info(speech_vi_video_id)
             # Convert speech_data to a DataFrame
